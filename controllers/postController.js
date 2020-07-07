@@ -2,11 +2,10 @@ const mongoose = require('mongoose');
 const Post = require('../models/postModel');
 const Comment = require('../models/commentModel');
 
-module.exports.index = async function (req, res) {
-    // select * from post; 
-
+module.exports.index = async function (req, res , next) {
+    
     try {
-
+             // select * from post; 
         const posts = await Post.find();
         res.status(200).json({
             data: posts,
@@ -14,11 +13,8 @@ module.exports.index = async function (req, res) {
         });
 
     } catch (err) {
-        res.status(500).json(
-            {
-                errors: err
-            });
-    }
+        next(err); 
+     }
 }
 
 module.exports.getComments = async function (req, res) {
