@@ -1,5 +1,10 @@
 const express = require('express');
 const path = require('path');
+
+//const helmet = require('helmet');
+//const rateLimit = require("express-rate-limit");
+//const cors = require('cors');
+
 const passport = require('passport');
 const logger = require('morgan');
 
@@ -44,6 +49,7 @@ mongoose.connect('mongodb+srv://dbuser02:dbuser02@cluster0-z4eg1.gcp.mongodb.net
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+//'./public'
 app.use(express.static(path.join(__dirname, 'public')));
 
 //init passport

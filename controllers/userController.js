@@ -1,4 +1,4 @@
-const e = require("express");
+const { validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
 const config = require('../config/index')
 const User = require("../models/userModel")
@@ -48,7 +48,7 @@ exports.getProfile = (req, res, next) => {
     const { _id, name, email, role } = req.user;
     try {
         res.status(200).json({
-            success : true,
+            success: true,
             user: {
                 id: _id,
                 name: name,
@@ -65,6 +65,16 @@ exports.getProfile = (req, res, next) => {
 module.exports.signup = async (req, res, next) => {
     try {
         const { name, email, password } = req.body;
+
+        //validation
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            const error = new Error('Please check data');
+            error.statusCode = 422;
+            error.validation = errors.array();
+            throw error;
+        }
+
         const existEmail = await User.findOne({ email: email });
 
         if (existEmail) {
@@ -93,9 +103,18 @@ exports.signin = async (req, res, next) => {
     try {
         const { email, password } = req.body;
         console.log
-        (`email: ${email} 
+            (`email: ${email} 
 password: ${password}`)
-        const user = await User.findOne({email: email});
+
+        //validation
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            const error = new Error('Please check data');
+            error.statusCode = 422;
+            error.validation = errors.array();
+            throw error;
+        }
+        const user = await User.findOne({ email: email });
         if (!user) {
             const error = new Error('Authentication Failed, User not found');
             error.statusCode = 404;
@@ -114,19 +133,19 @@ password: ${password}`)
         const token = await jwt.sign({
             id: user._id,
             role: user.role
-        }, config.JWT_SECRET , { expiresIn: '10 days' });
+        }, config.JWT_SECRET, { expiresIn: '10 days' });
 
         //decode expiration date
         const expires_in = jwt.decode(token);
 
         return res.status(200).json({
-            success : true,
+            success: true,
             token: token,
             expires_in: expires_in.exp,
-        }); 
+        });
 
     } catch (error) {
-       next(error); 
+        next(error);
     }
 }
 
